@@ -1,9 +1,17 @@
 import React, { useState } from 'react';
+import Select from "react-select";
 import axios from 'axios';
 
 function App() {
     const [inputText, setInputText] = useState(''); // ユーザー入力を管理するステート
     const [videoUrl, setVideoUrl] = useState('');  // 動画のURLを表示するためのステート
+    const [selectedOption, setSelectedOption] = useState(null); // 選択されたオプションを管理
+    
+    // ドロップダウンメニューのオプション
+    const imageOptions = [
+        { value: 'sensei', label: '武居教授' },
+        { value: 'hidaka', label: '大学院生A' },
+    ];
 
     const handleInputChange = (e) => {
         setInputText(e.target.value);
@@ -13,7 +21,8 @@ function App() {
         try {
             // 仮にバックエンドエンドポイントが http://localhost:5000/api だとする
             const response = await axios.post('http://localhost:5000/api', {
-                text: inputText
+                text: inputText, 
+                human: selectedOption ? selectedOption.value : null // 選択された画像の値をリクエストに同梱
             });
             const uniqueVideoUrl = `${response.data.result}?timestamp=${new Date().getTime()}`;  // タイムスタンプを追加
             setVideoUrl(uniqueVideoUrl);
@@ -45,6 +54,18 @@ function App() {
                     </video>
                 )}
             </div>
+            <Select
+                value={selectedOption}
+                onChange={setSelectedOption}
+                options={imageOptions}
+                placeholder="画像を選択..."
+                styles={{
+                    container: (provided) => ({
+                      ...provided,
+                      width: '300px'
+                    })
+                  }}
+            />
         </div>
     );
 }
