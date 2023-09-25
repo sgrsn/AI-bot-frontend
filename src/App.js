@@ -33,7 +33,6 @@ function App() {
     }
 
     useEffect(() => {
-        // 定期的にテキストデータを取得する関数
         const fetchText = async () => {
             try {
                 const response = await axios.get('http://localhost:8000/get_text');
@@ -42,13 +41,31 @@ function App() {
                 console.error('Error fetching data:', error);
             }
         };
-
-        // 3秒ごとにfetchTextを実行
+    
         const interval = setInterval(fetchText, 3000);
-
-        // クリーンアップ関数
+    
         return () => clearInterval(interval);
-    }, []); 
+    }, []);
+    
+    const handleTextChange = async () => {
+        try {
+            const response = await axios.post('http://localhost:5000/api', {
+                text: inputText,
+                human: selectedOption ? selectedOption.value : null
+            });
+            const uniqueVideoUrl = `${response.data.result}?timestamp=${new Date().getTime()}`;
+            setVideoUrl(uniqueVideoUrl);
+        } catch (error) {
+            console.error("APIリクエスト中にエラーが発生しました:", error);
+            setVideoUrl('');
+        }
+    };
+    
+    useEffect(() => {
+        if (inputText) {
+            handleTextChange();
+        }
+    }, [inputText]);
 
     return (
         <div className="App">
