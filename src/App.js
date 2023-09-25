@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect  } from 'react';
 import Select from "react-select";
 import axios from 'axios';
 
@@ -31,6 +31,24 @@ function App() {
             setVideoUrl('');
         }
     }
+
+    useEffect(() => {
+        // 定期的にテキストデータを取得する関数
+        const fetchText = async () => {
+            try {
+                const response = await axios.get('http://localhost:8000/get_text');
+                setInputText(response.data.text);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+
+        // 3秒ごとにfetchTextを実行
+        const interval = setInterval(fetchText, 3000);
+
+        // クリーンアップ関数
+        return () => clearInterval(interval);
+    }, []); 
 
     return (
         <div className="App">
